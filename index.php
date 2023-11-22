@@ -1,18 +1,20 @@
 <?php
 
-
+$sn = 'localhost';
+$us = 'root';
+$p = '';
 
 
  
 
 //deleta todos registros onde contem o 'valor_busca' na 'noma_da_coluna'
-//Ex: DeletarTudo('usuarios','nome','Eduardo'); deleta todo que tem esse nome
-function DeletarTudo($tabela, $noma_da_coluna, $valor_busca)
+//Ex: DeletarTudo('nome do banco','usuarios','nome','Eduardo'); deleta todo que tem esse nome
+function DeletarTudo($dbn,$tabela, $noma_da_coluna, $valor_busca)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
-    $dbn = 'usuarios';
+    global $sn;
+    global $us;
+    global $p;
+    
     $c = new mysqli($sn, $us, $p, $dbn);
     if ($c->connect_error) {
         echo 'Erro: ' . $c->connect_error;
@@ -30,19 +32,18 @@ function DeletarTudo($tabela, $noma_da_coluna, $valor_busca)
 
 //$colunas = 'nome,senha,idade';
 //   $dados = '"bbbb","cccc","22"';
-//    Add($colunas,$dados);
-function Add($arrayColunas, $arrayValores)
+//    Add('nome do banco','nome tabela',$colunas,$dados);
+function Add($dbn,$nometabela,$arrayColunas, $arrayValores)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
-    $dbn = 'usuarios';
+    global $sn;
+    global $us;
+    global $p; 
 
     $c = new mysqli($sn, $us, $p, $dbn);
     if ($c->connect_error) {
         echo '' . $c->connect_error . '';
     } else {
-        $sql = "INSERT INTO users ($arrayColunas) VALUES ($arrayValores)";
+        $sql = "INSERT INTO $nometabela ($arrayColunas) VALUES ($arrayValores)";
         if ($c->query($sql)) {
             echo "feito";
         } else {
@@ -52,19 +53,18 @@ function Add($arrayColunas, $arrayValores)
     }
 }
 
-//Existe('nome','Eduaro');
-function Existe($nomecoluna, $valor)
+//Existe('nome do banco','nome tabela','nome','Eduaro');
+function Existe($dbn,$nometabela,$nomecoluna, $valor)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
-    $dbn = 'usuarios';
+    global $sn;
+    global $us;
+    global $p; 
 
     $c = new mysqli($sn, $us, $p, $dbn);
         if ($c->connect_error) {
             echo '' . $c->connect_error . '';
         } else {
-            $sql = "SELECT $nomecoluna FROM users WHERE $nomecoluna = '$valor'";
+            $sql = "SELECT $nomecoluna FROM $nometabela WHERE $nomecoluna = '$valor'";
             $r = $c->query($sql);
             if ($r->num_rows > 0) 
             {
@@ -82,19 +82,18 @@ function Existe($nomecoluna, $valor)
 }
 
 
-//ObterValor('id','23','nome');obtem o valor do campo NOME do ID 23
-function ObterValor($nomecolunaID, $id, $colunadesejada)
+//ObterValor('nome do banco','nome tabela','id','23','nome');obtem o valor do campo NOME do ID 23
+function ObterValor($dbn,$nometabela,$nomecolunaID, $id, $colunadesejada)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
-    $dbn = 'usuarios';
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p, $dbn);
         if ($c->connect_error) {
             echo '' . $c->connect_error . '';
         } else {
-            $sql = "SELECT $colunadesejada FROM users WHERE $nomecolunaID = '$id'";
+            $sql = "SELECT $colunadesejada FROM $nometabela WHERE $nomecolunaID = '$id'";
             $r = $c->query($sql);
             if ($r->num_rows > 0) 
             {
@@ -112,20 +111,20 @@ function ObterValor($nomecolunaID, $id, $colunadesejada)
         }
 }
 
-//Atualizar('id', '25', 'nome','bilo');
+//Atualizar('nome do banco','nome tabela','id', '25', 'nome','bilo');
 //pega o id 25 da coluna ID e altera o campo NOME pra BILO
-function Atualizar($nomecolunaID, $id, $colunadesejadaAtt,$valorAtt)
+
+function Atualizar($dbn,$nometabela,$nomecolunaID, $id, $colunadesejadaAtt,$valorAtt)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
-    $dbn = 'usuarios';
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p, $dbn);
     if ($c->connect_error) {
         echo '' . $c->connect_error . '';
     } else {
-        $sql = "UPDATE users SET $colunadesejadaAtt = '$valorAtt' WHERE $nomecolunaID = '$id'";
+        $sql = "UPDATE $nometabela SET $colunadesejadaAtt = '$valorAtt' WHERE $nomecolunaID = '$id'";
         if ($c->query($sql)) {
             echo "feito";
         } else {
@@ -135,13 +134,12 @@ function Atualizar($nomecolunaID, $id, $colunadesejadaAtt,$valorAtt)
     }
 }
 
-AddColuna('bilo','biroleibe','preco');
-
+//AddColuna('biro','macacos','preco');
 function AddColuna($nomeBanco,$nometabela,$nomeColuna,$tipo='VARCHAR(255)')
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = ''; 
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p, $nomeBanco);
     if ($c->connect_error) {
@@ -157,11 +155,12 @@ function AddColuna($nomeBanco,$nometabela,$nomeColuna,$tipo='VARCHAR(255)')
     }
 }
 
+//CriarTabela('biro','macacos');
 function CriarTabela($nomeBanco,$nometabela)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = ''; 
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p, $nomeBanco);
     if ($c->connect_error) {
@@ -178,11 +177,13 @@ function CriarTabela($nomeBanco,$nometabela)
         $c->close();
     }
 }
+
+//CriarBanco('biro');
 function CriarBanco($nomeBanco)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p);
     if ($c->connect_error) {
@@ -201,9 +202,9 @@ function CriarBanco($nomeBanco)
 
 function DeletarTabela($nomeBanco,$nometabela)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = ''; 
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p, $nomeBanco);
     if ($c->connect_error) {
@@ -220,9 +221,9 @@ function DeletarTabela($nomeBanco,$nometabela)
 }
 function DeletarBanco($nomeBanco)
 {
-    $sn = 'localhost';
-    $us = 'root';
-    $p = '';
+    global $sn;
+    global $us;
+    global $p;
 
     $c = new mysqli($sn, $us, $p);
     if ($c->connect_error) {
