@@ -1,26 +1,26 @@
 <?php
 
 $banco = new BancoDeDados('localhost', 'root', ''); //cria a classe
-$banco->SHOW_LOGS(); //ativa a exibição dos logs no console
+$banco->EXIBIR_LOGS(); //ativa a exibição dos logs no console
 
-$banco->CREATE_DATABASE('meuBanco'); //cria um banco
-$banco->SELECT_DB('meuBanco'); //seleciona o banco recen criado
+$banco->CRIAR_BANCO_DE_DADOS('meuBanco'); //cria um banco
+$banco->SELECIONAR_BANCO_DE_DADOS('meuBanco'); //seleciona o banco recen criado
 
-$banco->CREATE_TABLE('usuarios'); //cria uma tabela no banco selecionado
-$banco->SELECT_TABLE('usuarios'); //seleciona a tabela recen criada
+$banco->CRIAR_TABELA('usuarios'); //cria uma tabela no banco selecionado
+$banco->SELECIONAR_TABELA('usuarios'); //seleciona a tabela recen criada
 
-$banco->ADD_COLUMN('nome'); //cria a coluna NOME na tabela selecionada anteriormente
-$banco->ADD_COLUMN('senha'); //cria a coluna SENHA na tabela selecionada anteriormente
+$banco->ADD_COLUNA('nome'); //cria a coluna NOME na tabela selecionada anteriormente
+$banco->ADD_COLUNA('senha'); //cria a coluna SENHA na tabela selecionada anteriormente
 
 //Simulação de dados de um usuario:
 $novoUsuarioNome = 'Eduardo Breso';
 $novoUsuarioSenha = '123';
 
 //procura se existe um registro com o nome EDUARDO, na coluna NOME
-if ($banco->IS_ITEM_EXISTS('nome', $novoUsuarioNome) === true) {
+if ($banco->VALOR_EXISTE('nome', $novoUsuarioNome) === true) {
     //usuario existe, verifica login
-    $idUsuario = $banco->GET_VALUE($novoUsuarioNome, 'nome', 'id'); //busca o ID do usuario
-    $senhaUsuario = $banco->GET_VALUE($idUsuario, 'id', 'senha'); //busca a senha do usuario com base no ID
+    $idUsuario = $banco->OBTER_VALOR($novoUsuarioNome, 'nome', 'id'); //busca o ID do usuario
+    $senhaUsuario = $banco->OBTER_VALOR($idUsuario, 'id', 'senha'); //busca a senha do usuario com base no ID
 
     //compara a senha recebida do banco com a recebida na variavel
     //perceba que no banco esta criptografada
@@ -32,11 +32,11 @@ if ($banco->IS_ITEM_EXISTS('nome', $novoUsuarioNome) === true) {
 } else {
     //usuario nao existe,inicia cadastro
 
-    $id = $banco->GET_LAST_ID('id'); //pega o ultimo index de ID registrado
+    $id = $banco->OBTER_ULTIMO_ID('id'); //pega o ultimo index de ID registrado
     $id++; //incrementa 1 para o novo cadastro
-    $banco->INSERT('id', $id); //registra o novo ID no banco
-    $banco->SET_VALUE('id', $id, 'nome', $novoUsuarioNome); //salva os dados do NOME recebidos,no campo NOME
-    $banco->SET_VALUE('id', $id, 'senha', $banco->HASH($novoUsuarioSenha)); //criptografa e salva os dados da SENHA recebidos,no campo SENHA
+    $banco->INSERIR('id', $id); //registra o novo ID no banco
+    $banco->DEFINIR_VALOR('id', $id, 'nome', $novoUsuarioNome); //salva os dados do NOME recebidos,no campo NOME
+    $banco->DEFINIR_VALOR('id', $id, 'senha', $banco->HASH($novoUsuarioSenha)); //criptografa e salva os dados da SENHA recebidos,no campo SENHA
     echo 'Usuario cadastrado com sucesso';
 }
 
@@ -54,22 +54,22 @@ class BancoDeDados
         $this->senha = $senha;
     }
 
-    public function SHOW_LOGS($bool = true)
+    public function EXIBIR_LOGS($bool = true)
     {
         $this->mostrarLogs = $bool;
     }
-    public function SELECT_DB($db_nome)
+    public function SELECIONAR_BANCO_DE_DADOS($db_nome)
     {
-        if($this->IF_DATABASE_EXISTS($db_nome))
+        if($this->BANCO_DE_DADOS_EXISTE($db_nome))
         $this->nomeBanco = $db_nome;
         else
         $this->consoleLog('Banco "' . $db_nome . '" não existe em "' . $this->host . '"');
 
     }
 
-    public function SELECT_TABLE($table_nome)
+    public function SELECIONAR_TABELA($table_nome)
     {
-        if ($this->IF_TABLE_EXISTS($table_nome))
+        if ($this->TABELA_EXISTE($table_nome))
             $this->nomeTabela = $table_nome;
         else
             $this->consoleLog('Tabela "' . $table_nome . '" não existe em "' . $this->nomeBanco . '"');
@@ -80,10 +80,10 @@ class BancoDeDados
         echo "<script>console.log('$msg');</script>";
     }
 
-    public function CREATE_DATABASE($nome)
+    public function CRIAR_BANCO_DE_DADOS($nome)
     {
         //Ex:
-        //CREATE_DATABASE('usuarios');
+        //CRIAR_BANCO_DE_DADOS('usuarios');
 
         try {
             $pdo = new PDO('mysql:host=' . $this->host, $this->usuario, $this->senha);
@@ -104,10 +104,10 @@ class BancoDeDados
 
     }
 
-    public function DROP_DATABASE($nome)
+    public function APAGAR_BANCO_DE_DADOS($nome)
     {
         //Ex:
-        //DROP_DATABASE('usuarios');
+        //APAGAR_BANCO_DE_DADOS('usuarios');
         try {
             $pdo = new PDO('mysql:host=' . $this->host, $this->usuario, $this->senha);
             //tratamento de erros
@@ -127,11 +127,11 @@ class BancoDeDados
 
     }
 
-    public function CREATE_TABLE($nomeTabela, $primaryKeyNome = 'id')
+    public function CRIAR_TABELA($nomeTabela, $primaryKeyNome = 'id')
     {
         //Ex:
-        //CREATE_DATABASE('usuarios');
-        //CREATE_TABLE('usuarios','dados2');
+        //CRIAR_BANCO_DE_DADOS('usuarios');
+        //CRIAR_TABELA('usuarios','dados2');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -155,11 +155,11 @@ class BancoDeDados
 
     }
 
-    public function DROP_TABLE($nomeTabela)
+    public function APAGAR_TABELA($nomeTabela)
     {
         //Deleta uma tabela
         //Ex:
-        //DROP_TABLE('meudn','usuarios');
+        //APAGAR_TABELA('meudn','usuarios');
         try {
             $pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->nomeBanco, $this->usuario, $this->senha);
 
@@ -180,10 +180,10 @@ class BancoDeDados
 
     }
 
-    public function ADD_COLUMN($nomeColuna, $tipoDeDado = 'VARCHAR(255)')
+    public function ADD_COLUNA($nomeColuna, $tipoDeDado = 'VARCHAR(255)')
     {
         //Ex:
-        //ADD_COLUMN('nome','VARCHAR(50)');
+        //ADD_COLUNA('nome','VARCHAR(50)');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -205,10 +205,10 @@ class BancoDeDados
 
     }
 
-    public function DROP_COLUMN($nomeColuna)
+    public function APAGAR_COLUNA($nomeColuna)
     {
         //Ex:
-        //DROP_COLUMN('nome');
+        //APAGAR_COLUNA('nome');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -231,13 +231,13 @@ class BancoDeDados
 
     }
 
-    public function GET_VALUE($referencia, $NomeColunaReferencia, $colunaValor)
+    public function OBTER_VALOR($referencia, $NomeColunaReferencia, $colunaValor)
     {
         //Ex: Obter o nome do user via id
-        // echo GET_VALUE(1,'id','nome');
+        // echo OBTER_VALOR(1,'id','nome');
         //
         //Obter o Id do usuario pelo nome:
-        //echo GET_VALUE('july','nome','id');
+        //echo OBTER_VALOR('july','nome','id');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -265,13 +265,13 @@ class BancoDeDados
 
     }
 
-    public function SET_VALUE($colunaId, $id, $colunaAlvo, $valor)
+    public function DEFINIR_VALOR($colunaId, $id, $colunaAlvo, $valor)
     {
         //Ex: Muda a senha da July pra 1020
-        //SET_VALUE('nome','july','senha','1020');
+        //DEFINIR_VALOR('nome','july','senha','1020');
         //
         //ou via ID
-        //SET_VALUE('id','1','senha','1020');
+        //DEFINIR_VALOR('id','1','senha','1020');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -299,7 +299,7 @@ class BancoDeDados
 
     }
 
-    public function IS_ITEM_EXISTS($colunaAlvo, $valorBuscado)
+    public function VALOR_EXISTE($colunaAlvo, $valorBuscado)
     {
         try {
             $p = 'mysql:host=' . $this->host . ';dbname=' . $this->nomeBanco;
@@ -330,7 +330,7 @@ class BancoDeDados
 
     }
 
-    public function GET_LAST_ID($colunaID)
+    public function OBTER_ULTIMO_ID($colunaID)
     {
         //Returna o ultimo valor de um registro
         try {
@@ -357,12 +357,12 @@ class BancoDeDados
 
     }
 
-    public function INSERT($nomeColuna, $valor)
+    public function INSERIR($nomeColuna, $valor)
     {
         //Cria um registro
         //
         //Ex:
-        //INSERT('id','1');
+        //INSERIR('id','1');
 
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
@@ -388,7 +388,7 @@ class BancoDeDados
 
     }
 
-    public function DELETE_ALL_TABLES()
+    public function APAGAR_TODAS_TABELAS()
     {
         //Deleta todas tabelas de um banco
         try {
@@ -403,7 +403,7 @@ class BancoDeDados
             $tabelas = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
             foreach ($tabelas as $t) {
-                $this->DROP_TABLE($t);
+                $this->APAGAR_TABELA($t);
                 $this->consoleLog('Tabela "' . $t . '" excluida do banco "' . $this->nomeBanco . '" com sucesso');
 
             }
@@ -417,7 +417,7 @@ class BancoDeDados
     }
 
 
-    public function DELETE_ALL_COLUMNS()
+    public function APAGAR_TODAS_COLUNAS()
     {
         //Deleta todas colunas de uma tabela
         try {
@@ -432,7 +432,7 @@ class BancoDeDados
             $tabelas = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
             foreach ($tabelas as $t) {
-                $this->DROP_COLUMN($t);
+                $this->APAGAR_COLUNA($t);
                 $this->consoleLog('Tabela "' . $t . '" excluida do banco "' . $this->nomeBanco . '" com sucesso');
             }
 
@@ -445,13 +445,13 @@ class BancoDeDados
     }
 
 
-    public function GET_ALL($coluna)
+    public function OBTER_TUDO($coluna)
     {
         /*
         Retorna um array com todos valores de uma coluna especifica
 
         Ex:
-        $array = $suaClasse->GET_ALL('nome'); 
+        $array = $suaClasse->OBTER_TUDO('nome'); 
         foreach($array as $n)
         {
             echo $n.'<br>';
@@ -477,11 +477,11 @@ class BancoDeDados
         }
     }
 
-    public function CHANGE_ALL($nomeColuna, $valor)
+    public function MODIFICAR_TUDO($nomeColuna, $valor)
     {
 
         //Ex:
-        //CHANGE_ALL('senha','123');
+        //MODIFICAR_TUDO('senha','123');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -505,7 +505,7 @@ class BancoDeDados
         }
     }
 
-    public function IF_COLLUMN_EXISTS($nomeColuna)
+    public function COLUNA_EXISTE($nomeColuna)
     {
         //Verifica se uma coluna existe em uma tabela
         try {
@@ -533,10 +533,10 @@ class BancoDeDados
         }
     }
 
-    public function IF_TABLE_EXISTS($nomeTabela)
+    public function TABELA_EXISTE($nomeTabela)
     {
         //Ex:
-        //CHANGE_ALL('senha','123');
+        //MODIFICAR_TUDO('senha','123');
         try {
             $p = 'mysql:' . 'host=' . $this->host . ';dbname=' . $this->nomeBanco . '';
             $pdo = new PDO($p, $this->usuario, $this->senha);
@@ -562,10 +562,10 @@ class BancoDeDados
         }
     }
 
-    public function IF_DATABASE_EXISTS($nomeDB)
+    public function BANCO_DE_DADOS_EXISTE($nomeDB)
     {
         //Ex:
-        //CHANGE_ALL('senha','123');
+        //MODIFICAR_TUDO('senha','123');
         try {
             $p = 'mysql:' . 'host=' . $this->host;
             $pdo = new PDO($p, $this->usuario, $this->senha);
