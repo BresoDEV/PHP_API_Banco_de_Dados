@@ -1,39 +1,5 @@
 <?php
 
-$banco = new BancoDeDados('localhost', 'root', ''); //cria a classe
-
-$banco->EXIBIR_LOGS(); //ativa a exibição dos logs no console
-$banco->SALVAR_LOGS(); //ativa a gravações dos logs no arquivo log.txt
-$banco->CRIAR_BANCO_DE_DADOS('meuBanco'); //cria um banco
-$banco->SELECIONAR_BANCO_DE_DADOS('meuBanco2'); //seleciona o banco recen criado
-$banco->CRIAR_TABELA('usuarios'); //cria uma tabela no banco selecionado
-$banco->SELECIONAR_TABELA('usuarios'); //seleciona a tabela recen criada
-$banco->ADD_COLUNA('nome'); //cria a coluna NOME na tabela selecionada anteriormente
-$banco->ADD_COLUNA('senha'); //cria a coluna SENHA na tabela selecionada anteriormente
-//Simulação de dados de um usuario:
-$novoUsuarioNome = 'Eduardo Breso';
-$novoUsuarioSenha = '123';
-//procura se existe um registro com o nome EDUARDO, na coluna NOME
-if ($banco->VALOR_EXISTE('nome', $novoUsuarioNome) === true) {
-    //usuario existe, verifica login
-    $idUsuario = $banco->OBTER_VALOR($novoUsuarioNome, 'nome', 'id'); //busca o ID do usuario
-    $senhaUsuario = $banco->OBTER_VALOR($idUsuario, 'id', 'senha'); //busca a senha do usuario com base no ID
-    //compara a senha recebida do banco com a recebida na variavel
-    //perceba que no banco esta criptografada
-    //então, deve-se criptografar o valor antes de comparar
-    if ($banco->HASH($novoUsuarioSenha) == $senhaUsuario)
-        echo 'Logado com sucesso';
-    else
-        echo 'Senha incorreta';
-} else {
-    //usuario nao existe,inicia cadastro
-    $id = $banco->OBTER_ULTIMO_ID('id'); //pega o ultimo index de ID registrado
-    $id++; //incrementa 1 para o novo cadastro
-    $banco->INSERIR('id', $id); //registra o novo ID no banco
-    $banco->DEFINIR_VALOR('id', $id, 'nome', $novoUsuarioNome); //salva os dados do NOME recebidos,no campo NOME
-    $banco->DEFINIR_VALOR('id', $id, 'senha', $banco->HASH($novoUsuarioSenha)); //criptografa e salva os dados da SENHA recebidos,no campo SENHA
-    echo 'Usuario cadastrado com sucesso';
-}
 
 
 
@@ -60,6 +26,12 @@ class BancoDeDados
         $this->salvarLogs = $bool;
         $this->consoleLog('Logs Salvos em "log.txt" Ativados');
     }
+    public function ZERAR_LOGS()
+    {
+        //zera os logs no arquivo log.txt
+        file_put_contents('log.txt','');
+        $this->consoleLog('Log zerado');
+    }
     public function SELECIONAR_BANCO_DE_DADOS($db_nome)
     {
         if ($this->BANCO_DE_DADOS_EXISTE($db_nome))
@@ -69,7 +41,7 @@ class BancoDeDados
         else {
             if ($this->mostrarLogs) {
                 $this->consoleLog('Banco "' . $db_nome . '" não existe em "' . $this->host . '"');
-                //error_log('Banco "' . $db_nome . '" não existe em "' . $this->host . '"');
+                die();
             }
         }
     }
@@ -82,7 +54,7 @@ class BancoDeDados
         else {
             if ($this->mostrarLogs) {
                 $this->consoleLog('Tabela "' . $table_nome . '" não existe em "' . $this->nomeBanco . '"');
-                //error_log('Tabela "' . $table_nome . '" não existe em "' . $this->nomeBanco . '"');
+                die();
             }
         }
     }
@@ -124,7 +96,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -146,7 +118,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -172,7 +144,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -195,7 +167,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -218,7 +190,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -242,7 +214,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -273,7 +245,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -303,7 +275,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -332,7 +304,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -357,7 +329,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -385,7 +357,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -412,7 +384,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -439,11 +411,11 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
-    public function OBTER_TUDO($coluna)
+    public function OBTER_TODOS_VALORES($coluna)
     {
         /*
         Retorna um array com todos valores de uma coluna especifica
@@ -466,11 +438,11 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
-    public function MODIFICAR_TUDO($nomeColuna, $valor)
+    public function MODIFICAR_TODOS_VALORES($nomeColuna, $valor)
     {
         //Ex:
         //MODIFICAR_TUDO('senha','123');
@@ -492,7 +464,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -525,7 +497,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -559,7 +531,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -594,7 +566,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -633,7 +605,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                ////error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -672,7 +644,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                ////error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -771,7 +743,7 @@ class BancoDeDados
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
                 $this->consoleLog('' . $e->getMessage(), 'erro');
-                //error_log($e->getMessage());
+                die();
             }
         }
     }
@@ -779,7 +751,47 @@ class BancoDeDados
 
 
 
+/*
+Exemplo de login/cadastro
 
+$banco = new BancoDeDados('localhost', 'root', ''); //cria a classe
+$banco->EXIBIR_LOGS(); //ativa a exibição dos logs no console
+$banco->SALVAR_LOGS(); //ativa a gravações dos logs no arquivo log.txt
+$banco->CRIAR_BANCO_DE_DADOS('meuBanco'); //cria um banco
+$banco->SELECIONAR_BANCO_DE_DADOS('meuBanco2'); //seleciona o banco recen criado
+$banco->CRIAR_TABELA('usuarios'); //cria uma tabela no banco selecionado
+$banco->SELECIONAR_TABELA('usuarios'); //seleciona a tabela recen criada
+$banco->ADD_COLUNA('nome'); //cria a coluna NOME na tabela selecionada anteriormente
+$banco->ADD_COLUNA('senha'); //cria a coluna SENHA na tabela selecionada anteriormente
+//Simulação de dados de um usuario:
+$novoUsuarioNome = 'Eduardo Breso';
+$novoUsuarioSenha = '123';
+//procura se existe um registro com o nome EDUARDO, na coluna NOME
+if ($banco->VALOR_EXISTE('nome', $novoUsuarioNome) === true) {
+    //usuario existe, verifica login
+    $idUsuario = $banco->OBTER_VALOR($novoUsuarioNome, 'nome', 'id'); //busca o ID do usuario
+    $senhaUsuario = $banco->OBTER_VALOR($idUsuario, 'id', 'senha'); //busca a senha do usuario com base no ID
+    //compara a senha recebida do banco com a recebida na variavel
+    //perceba que no banco esta criptografada
+    //então, deve-se criptografar o valor antes de comparar
+    if ($banco->HASH($novoUsuarioSenha) == $senhaUsuario)
+        echo 'Logado com sucesso';
+    else
+        echo 'Senha incorreta';
+} else {
+    //usuario nao existe,inicia cadastro
+    $id = $banco->OBTER_ULTIMO_ID('id'); //pega o ultimo index de ID registrado
+    $id++; //incrementa 1 para o novo cadastro
+    $banco->INSERIR('id', $id); //registra o novo ID no banco
+    $banco->DEFINIR_VALOR('id', $id, 'nome', $novoUsuarioNome); //salva os dados do NOME recebidos,no campo NOME
+    $banco->DEFINIR_VALOR('id', $id, 'senha', $banco->HASH($novoUsuarioSenha)); //criptografa e salva os dados da SENHA recebidos,no campo SENHA
+    echo 'Usuario cadastrado com sucesso';
+}
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+*/
 
 
 
