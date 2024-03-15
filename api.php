@@ -13,6 +13,9 @@ class BancoDeDados
         $this->host = $host;
         $this->usuario = $usuario;
         $this->senha = $senha;
+        if ($this->mostrarLogs) {
+            LOGS::cLog('Classe "BancoDeDados" criada', 'green');
+        }
     }
     public function EXIBIR_LOGS($bool = true)
     {
@@ -29,16 +32,15 @@ class BancoDeDados
     public function ZERAR_LOGS()
     {
         //zera os logs no arquivo log.txt
-        file_put_contents('log.txt','');
+        file_put_contents('log.txt', '');
         $this->consoleLog('Log zerado');
     }
     public function SELECIONAR_BANCO_DE_DADOS($db_nome)
     {
-        if ($this->BANCO_DE_DADOS_EXISTE($db_nome))
-            {
-                $this->consoleLog('Banco "' . $db_nome . '" selecionado');
-                $this->nomeBanco = $db_nome;}
-        else {
+        if ($this->BANCO_DE_DADOS_EXISTE($db_nome)) {
+            $this->consoleLog('Banco "' . $db_nome . '" selecionado');
+            $this->nomeBanco = $db_nome;
+        } else {
             if ($this->mostrarLogs) {
                 $this->consoleLog('Banco "' . $db_nome . '" não existe em "' . $this->host . '"');
                 die();
@@ -47,11 +49,10 @@ class BancoDeDados
     }
     public function SELECIONAR_TABELA($table_nome)
     {
-        if ($this->TABELA_EXISTE($table_nome))
-            {
-                $this->consoleLog('Tabela "' . $table_nome . '"selecionada');
-                $this->nomeTabela = $table_nome;}
-        else {
+        if ($this->TABELA_EXISTE($table_nome)) {
+            $this->consoleLog('Tabela "' . $table_nome . '"selecionada');
+            $this->nomeTabela = $table_nome;
+        } else {
             if ($this->mostrarLogs) {
                 $this->consoleLog('Tabela "' . $table_nome . '" não existe em "' . $this->nomeBanco . '"');
                 die();
@@ -61,9 +62,9 @@ class BancoDeDados
     private function consoleLog($msg, $tipo = 'n')
     {
         if ($tipo === 'n')
-        echo "<script>console.log('%c".$msg."','color:green;font-weight: bold;font-size:12px;background-color:transparent');</script>";
+            echo "<script>console.log('%c" . $msg . "','color:green;font-weight: bold;font-size:12px;background-color:transparent');</script>";
         else
-        echo "<script>console.log('%c".$msg."','color:red;font-weight: bold;font-size:12px;background-color:transparent');</script>";
+            echo "<script>console.log('%c" . $msg . "','color:red;font-weight: bold;font-size:12px;background-color:transparent');</script>";
         if ($this->salvarLogs) {
             if (!file_exists('log.txt')) {
                 file_put_contents('log.txt', '');
@@ -570,7 +571,7 @@ class BancoDeDados
             }
         }
     }
-   
+
     public function DUPLICAR_TABELA($nomeNovaTabela)
     {
         //Duplica uma tabela e todos seus dados 
@@ -621,25 +622,23 @@ class BancoDeDados
         try {
 
             $pdo = new PDO('mysql:host=' . $this->host, $this->usuario, $this->senha);
-                //tratamento de erros
-                $pdo->setAttribute(0x3, 0x2);
+            //tratamento de erros
+            $pdo->setAttribute(0x3, 0x2);
 
 
-                $d = $pdo->query('SHOW DATABASES')->fetchAll(0x7);
-                foreach($d as $dbs)
-                {
-                    if($dbs != 'information_schema' && $dbs != 'performance_schema' && $dbs!='sys')
-                    {
-                        echo '<br>'.$dbs;
-                        $pdo->exec('DROP DATABASE IF EXISTS '.$dbs);
-                    }
+            $d = $pdo->query('SHOW DATABASES')->fetchAll(0x7);
+            foreach ($d as $dbs) {
+                if ($dbs != 'information_schema' && $dbs != 'performance_schema' && $dbs != 'sys') {
+                    
+                    $pdo->exec('DROP DATABASE IF EXISTS ' . $dbs);
                 }
+            }
 
-                //-----------------------
-                if ($this->mostrarLogs) {
-                    $this->consoleLog('Todos bancos de dados foram excluidos com sucesso');
-                    ////error_log('Todos bancos de dados foram excluidos com sucesso');
-                }
+            //-----------------------
+            if ($this->mostrarLogs) {
+                $this->consoleLog('Todos bancos de dados foram excluidos com sucesso');
+                ////error_log('Todos bancos de dados foram excluidos com sucesso');
+            }
             //-----------------------
         } catch (PDOException $e) {
             if ($this->mostrarLogs) {
@@ -715,16 +714,16 @@ class BancoDeDados
                 $tabelas = $stmt->fetchAll(0x7);
 
                 foreach ($tabelas as $tabela) {
-                    echo '<br><br>'.$tabela;
-                  
-                    $sqlCreate = 'CREATE TABLE IF NOT EXISTS '.$tabela.' LIKE '.$tabela.'';
-                    echo '<br><br>'.$sqlCreate;
-                   $pdoD->exec($sqlCreate);
-            
-                   
-                   $sqlInsert = 'INSERT INTO '.$tabela.' SELECT * FROM '.$tabela.'';
-                   echo '<br><br>'.$sqlInsert;
-                   $pdoD->exec($sqlInsert);
+                    echo '<br><br>' . $tabela;
+
+                    $sqlCreate = 'CREATE TABLE IF NOT EXISTS ' . $tabela . ' LIKE ' . $tabela . '';
+                    echo '<br><br>' . $sqlCreate;
+                    $pdoD->exec($sqlCreate);
+
+
+                    $sqlInsert = 'INSERT INTO ' . $tabela . ' SELECT * FROM ' . $tabela . '';
+                    echo '<br><br>' . $sqlInsert;
+                    $pdoD->exec($sqlInsert);
                 }
 
 
@@ -749,6 +748,471 @@ class BancoDeDados
     }
 }
 
+class LOGS
+{
+    public static function cLogErro($msg, $cor = 'white', $bgcolor = 'transparent')
+    {
+        echo "<script>console.log('%c Erro: " . $msg . "','border-radius: 10px;background: linear-gradient(red, rgb(150 10 10));color:" . $cor . ";font-weight: bold;font-size:12px;background-color:" . $bgcolor . ";padding:10px');</script>";
+    }
+
+    public static function cLogSucesso($msg, $cor = 'white', $bgcolor = 'transparent')
+    {
+        echo "<script>console.log('%c" . $msg . "','border-radius: 10px;background: linear-gradient(green, rgb(10 150 10));color:" . $cor . ";font-weight: bold;font-size:12px;background-color:" . $bgcolor . ";padding:10px');</script>";
+    }
+
+    public static function cLog($msg, $cor = 'black', $bgcolor = 'transparent')
+    {
+        echo "<script>console.log('%c" . $msg . "','color:" . $cor . ";font-weight: bold;font-size:12px;background-color:" . $bgcolor . ";padding:10px');</script>";
+    }
+}
+
+class STRINGS
+{
+    //Como chamar as funcoes:
+    //STRINGS::funcao()
+    public static function REMOVE_NUMBERS($str)
+    {
+        return preg_replace('/[0-9]+/', '', $str);
+    }
+    public static function REMOVE_ALL_LETTERS($str)
+    {
+        $e = preg_replace('/[a-z]+/', '', $str);
+        $e = preg_replace('/[A-Z]+/', '', $e);
+        return $e;
+    }
+    public static function REMOVE_UPPER_LETTERS($str)
+    {
+        return preg_replace('/[A-Z]+/', '', $str);
+    }
+    public static function REMOVE_LOWER_LETTERS($str)
+    {
+        return preg_replace('/[a-z]+/', '', $str);
+    }
+    public static function TO_UPPER($str)
+    {
+        return strtoupper($str);
+    }
+    public static function TO_LOWER($str)
+    {
+        return strtolower($str);
+    }
+
+    public static function LOREM($palavras = 15)
+    {
+        //Ex:
+        //echo Strings::LOREM();
+        $c = 'aeiourtplhgsdcbmn';
+        $tc = strlen($c);
+        $s = 'Lorem ';
+        for ($i1 = 0; $i1 < $palavras; $i1++) {
+            for ($i = 0; $i < rand(5, 10); $i++) {
+                $ia = rand(0, $tc - 1);
+                $s .= $c[$ia];
+            }
+            if ($i1 % 10 === 0 && $i1 > 10) {
+                $ia = rand(0, $tc - 1);
+                $s .= '. ' . strtoupper($c[$ia]);
+            } else {
+                $s .= ' ';
+            }
+        }
+        $s .= '.';
+        return $s;
+    }
+
+    public static function ENCRIPT_ROT13($str)
+    {
+        //Como usar:
+        //echo Strings::ENCRIPT_ROT13($e);
+        if (strpos($str, ' 0x') !== false)
+            $str = str_replace(' 0x', ' ', $str);
+        else
+            $str = str_replace(' ', ' 0x', $str);
+        return str_rot13($str);
+    }
+
+
+    public static function CLEAN_STRING($string, $removerEspacos = true)
+    {
+        //Remove caracteres especiais e espaços em branco de uma string
+        $a = $string;
+        $i = 0;
+        while ($i !== 100) {
+            $a = str_replace('\'', '', $a);
+            $a = str_replace('´', '', $a);
+            $a = str_replace('[', '', $a);
+            $a = str_replace(']', '', $a);
+            $a = str_replace('~', '', $a);
+            $a = str_replace(';', '', $a);
+            $a = str_replace('.', '', $a);
+            $a = str_replace(',', '', $a);
+            $a = str_replace('/', '', $a);
+            $a = str_replace('=', '', $a);
+            $a = str_replace('-', '', $a);
+            $a = str_replace('?', '', $a);
+            $a = str_replace(':', '', $a);
+            $a = str_replace('>', '', $a);
+            $a = str_replace('<', '', $a);
+            $a = str_replace('+', '', $a);
+            $a = str_replace('_', '', $a);
+            $a = str_replace(')', '', $a);
+            $a = str_replace('(', '', $a);
+            $a = str_replace('*', '', $a);
+            $a = str_replace('&', '', $a);
+            $a = str_replace('¨', '', $a);
+            $a = str_replace('%', '', $a);
+            $a = str_replace('$', '', $a);
+            $a = str_replace('#', '', $a);
+            $a = str_replace('@', '', $a);
+            $a = str_replace('!', '', $a);
+            $a = str_replace('"', '', $a);
+            if ($removerEspacos)
+                $a = str_replace(' ', '', $a);
+            $i++;
+        }
+        return $a;
+    }
+
+    public static function gerarPalavra($tam = 20)
+    {
+        $c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $tc = strlen($c);
+        $s = '';
+        for ($i = 0; $i < $tam; $i++) {
+            $ia = rand(0, $tc - 1);
+            $s .= $c[$ia];
+        }
+        return $s;
+    }
+
+    public static function SQL_INJECTION_BLOCK($string)
+    {
+        $a = $string;
+        $i = 0;
+        while ($i !== 100) {
+            $a = str_replace('\'', '', $a);
+            $a = str_replace('*', '', $a);
+            $a = str_replace('SELECT', '', $a);
+            $a = str_replace('CREATE', '', $a);
+            $a = str_replace('DELETE', '', $a);
+            $a = str_replace('/', '', $a);
+            $i++;
+        }
+        return $a;
+    }
+
+    public static function TO_ARRAY($str,$separador = ' ')
+    {
+        return explode($separador,$str);
+    }
+
+}
+
+class TOKEN
+{
+    public static function GERAR()
+    {
+        $lista = array();
+        for ($i = 10; $i <= 40; $i++) {
+            for ($i2 = 10; $i2 <= 40; $i2++) {
+                $r = 100 - ($i + $i2);
+                $lista[] = $i . $i2 . $r;
+            }
+        }
+        return $lista[rand(0, sizeof($lista))];
+    }
+    public static function VALIDAR_TOKEN($token)
+    {
+
+        if (!isset($token[5])) {
+            return false;
+        }
+        $tk1 = $token[0] . $token[1];
+        $tk2 = $token[2] . $token[3];
+        $tk3 = $token[4] . $token[5];
+        if (($tk1 + $tk2 + $tk3) == 100)
+            return true;
+        else
+            return false;
+    }
+}
+
+class COOKIES
+{
+
+
+    public static function SET($nome, $valor, $tempo = 3600 /*1 hora*/, $log = false)
+    {
+        setcookie($nome, $valor, time() + $tempo, '/');
+        if ($log) {
+            LOGS::cLog('Cookie "' . $nome . '" setado com sucesso');
+        }
+    }
+
+    public static function SET_ONLY_IF_EXISTS($nome, $valor, $tempo = 3600 /*1 hora*/, $log = false)
+    {
+        if (COOKIES::EXISTS($nome)) {
+            setcookie($nome, $valor, time() + $tempo, '/');
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" setado com sucesso');
+            }
+        } else {
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" nao existe');
+            }
+        }
+
+    }
+
+    public static function SET_ONLY_IF_NOT_EXISTS($nome, $valor, $tempo = 3600 /*1 hora*/, $log = false)
+    {
+        if (!COOKIES::EXISTS($nome)) {
+            setcookie($nome, $valor, time() + $tempo, '/');
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" setado com sucesso');
+            }
+        } else {
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" ja existe');
+            }
+        }
+
+    }
+
+
+    public static function EXISTS($nome, $log = false)
+    {
+        if (isset($_COOKIE[$nome])) {
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" existe');
+            }
+            return true;
+        }
+        if ($log) {
+            LOGS::cLog('Cookie "' . $nome . '" não existe');
+        }
+        return false;
+    }
+    public static function GET($nome, $log = false)
+    {
+        if (COOKIES::EXISTS($nome)) {
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" existe');
+            }
+            return $_COOKIE[$nome];
+        } else {
+            if ($log) {
+                LOGS::cLog('Cookie "' . $nome . '" não existe');
+            }
+            return '';
+        }
+    }
+}
+
+
+
+class SESSIONS
+{
+    public static function IS_ACTIVE()
+    {
+        if (session_status() == 2)
+            return true;
+        else
+            return false;
+    }
+
+    public static function START()
+    {
+        if (!SESSIONS::IS_ACTIVE()) {
+            session_start();
+        }
+    }
+    public static function DESTROY()
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            session_destroy();
+        }
+    }
+
+    public static function VALUE_EXISTS($item)
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            return isset($_SESSION[$item]);
+        }
+        return false;
+    }
+
+    public static function GET_VALUE($item)
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            if (SESSIONS::VALUE_EXISTS($item)) {
+                return $_SESSION[$item];
+            }
+            return '';
+        }
+        return '';
+    }
+    public static function SET_VALUE($item, $value)
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            $_SESSION[$item] = $value;
+        }
+    }
+
+
+    public static function SET_VALUE_ONLY_IF_NOT_EXISTS($item, $value)
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            if (!SESSIONS::VALUE_EXISTS($item)) {
+                $_SESSION[$item] = $value;
+            }
+        }
+    }
+
+    public static function SET_VALUE_ONLY_IF_EXISTS($item, $value)
+    {
+        if (SESSIONS::IS_ACTIVE()) {
+            if (SESSIONS::VALUE_EXISTS($item)) {
+                $_SESSION[$item] = $value;
+            }
+        }
+    }
+
+}
+
+
+class LOCAL_STORAGE
+{
+    public static function SET_VALUE($item, $value)
+    {
+        echo '<script>localStorage.setItem("' . $item . '","' . $value . '");</script>';
+    }
+    public static function SET_VALUE_ONLY_IF_EXISTS($item, $value)
+    {
+        echo '<script>
+        if(localStorage.getItem("' . $item . '"))
+        {
+            localStorage.setItem("' . $item . '","' . $value . '");
+        }
+        </script>
+        ';
+    }
+    public static function SET_VALUE_ONLY_IF_NOT_EXISTS($item, $value)
+    {
+        echo '<script>
+        if(!localStorage.getItem("' . $item . '"))
+        {
+            localStorage.setItem("' . $item . '","' . $value . '");
+        }
+        </script>
+        ';
+    }
+    public static function GET_VALUE_ONLY_IF_EXISTS($item)
+    {
+        /*Ex:
+        <p>
+        Bem vindo(a) <?php 
+        LOCAL_STORAGE::GET_VALUE_ONLY_IF_EXISTS('Nome');
+        ?></p>
+        */
+        echo '<script>
+        if(localStorage.getItem("' . $item . '"))
+        {
+            document.write(localStorage.getItem("' . $item . '"));
+        }
+        </script>
+        ';
+    }
+
+}
+
+
+class JSON
+{
+    public static function ARRAY_TO_FILE($array, $fileName)
+    {
+        /*
+        $b = [
+            ['oi1','11'],
+            ['oi2','22'],
+            ['oi3','33'],
+            ['oi4','44'],
+
+        ];
+
+        ou bidimencionais:
+
+        $b =array(
+        array(
+           'user'=>'edu'
+        ),
+        array(
+           'user'=>'edu2'
+         )
+    );
+
+        JSON::ARRAY_TO_FILE($b,"teste");
+        */
+        file_put_contents($fileName . '.json', json_encode($array, true));
+    }
+
+    public static function ARRAY_TO_FILE_ONLY_IF_FILE_NOT_EXISTS($array, $fileName)
+    {
+        if (!file_exists($fileName . '.json')) {
+            file_put_contents($fileName . '.json', json_encode($array, true));
+        } else {
+            LOGS::cLogErro('Arquivo ' . $fileName . '.json ja existe');
+        }
+    }
+
+    public static function ARRAY_TO_FILE_ONLY_IF_FILE_EXISTS($array, $fileName)
+    {
+        if (file_exists($fileName . '.json')) {
+            file_put_contents($fileName . '.json', json_encode($array, true));
+        } else {
+            LOGS::cLogErro('Arquivo ' . $fileName . '.json não existe');
+        }
+    }
+
+
+    public static function FILE_TO_ARRAY($fileName)
+    {
+        /*
+        $b = JSON::FILE_TO_ARRAY("teste");
+        print_r($b);
+        */
+        if (file_exists($fileName . '.json')) {
+            return json_decode(file_get_contents($fileName . '.json'), true);
+        } else {
+            LOGS::cLogErro('Arquivo ' . $fileName . '.json não existe');
+            die();
+        }
+    }
+}
+
+class HTML
+{
+    public static function HOVER_ELEMENTS_INFO()
+    {
+        echo "<script>
+        var i = document.querySelectorAll('*');
+        i.forEach(element => {
+            element.title = 'ID: '+element.style.width;
+        });
+        </script>
+        ";
+    }
+    public static function CREATE_LOGIN_FORM_POST($userTAG, $senhaTAG, $txtButton, $paginaDestino = '')
+    {
+        echo '
+<form action="' . $paginaDestino . '" method="post">
+    <input type="text" name="' . $userTAG . '" placeholder="Usuario" required><br>
+    <input type="password" name="' . $senhaTAG . '" placeholder="Senha" required><br>
+    <button id="aaaa">' . $txtButton . '</button><br>
+</form>
+';
+    }
+}
 
 
 /*
@@ -758,7 +1222,7 @@ $banco = new BancoDeDados('localhost', 'root', ''); //cria a classe
 $banco->EXIBIR_LOGS(); //ativa a exibição dos logs no console
 $banco->SALVAR_LOGS(); //ativa a gravações dos logs no arquivo log.txt
 $banco->CRIAR_BANCO_DE_DADOS('meuBanco'); //cria um banco
-$banco->SELECIONAR_BANCO_DE_DADOS('meuBanco2'); //seleciona o banco recen criado
+$banco->SELECIONAR_BANCO_DE_DADOS('meuBanco'); //seleciona o banco recen criado
 $banco->CRIAR_TABELA('usuarios'); //cria uma tabela no banco selecionado
 $banco->SELECIONAR_TABELA('usuarios'); //seleciona a tabela recen criada
 $banco->ADD_COLUNA('nome'); //cria a coluna NOME na tabela selecionada anteriormente
@@ -796,21 +1260,23 @@ if ($banco->VALOR_EXISTE('nome', $novoUsuarioNome) === true) {
 
 
 
+$nc = 'BresoDB_API2';
 
-
-
-
-
-
-function gerarPalavra()
-{
-    $c = 'abcdefghijklmnopqrstuvwxyz';
-    $tc = strlen($c);
-    $s = '';
-    for ($i = 0; $i < 10; $i++) {
-        $ia = rand(0, $tc - 1);
-        $s .= $c[$ia];
+LOGS::cLogSucesso('API carregada com sucesso!', 'white');
+if (!COOKIES::EXISTS($nc)) {
+    COOKIES::SET($nc, TOKEN::GERAR());
+    //setcookie($nc, TOKEN::GERAR(), time() + 3600, '/');
+    LOGS::cLogSucesso('ID de sessão gerado', 'white');
+} else {
+    if (TOKEN::VALIDAR_TOKEN(COOKIES::GET($nc))) {
+        LOGS::cLogSucesso('ID de sessão validado com sucesso ', 'white');
+    } else {
+        LOGS::cLogErro('ID de sessão inválido');
     }
-    return $s;
 }
+
+
+
+
+
 ?>
